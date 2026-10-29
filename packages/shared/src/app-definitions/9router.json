@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "slug": "9router",
+  "name": "9Router",
+  "description": "Connect DSLN Capital Command Center to a 9Router OpenAI-compatible gateway.",
+  "categories": ["ai"],
+  "branding": {
+    "logoUrl": "/brands/apps/api-key-generic.svg"
+  },
+  "urlPatterns": [],
+  "methods": [
+    {
+      "key": "ai-api_key",
+      "label": "9Router API key",
+      "purpose": "ai",
+      "transport": "runtime_auth",
+      "auth": "api_key",
+      "ai": {
+        "provider": "openai",
+        "method": "api_key"
+      },
+      "grantKinds": ["user", "organization"],
+      "ownershipModes": ["customer"],
+      "whenToUse": "Connect any compatible harness to a 9Router gateway.",
+      "guidanceMd": "Use your personal account or an explicitly shared company account.",
+      "riskTier": "S3",
+      "credentialFields": [
+        {
+          "key": "apiKey",
+          "label": "API key",
+          "type": "password",
+          "required": true,
+          "placeholder": "Enter API key",
+          "secret": true
+        },
+        {
+          "key": "baseUrl",
+          "label": "Base URL",
+          "type": "text",
+          "required": false,
+          "placeholder": "http://localhost:8080/v1",
+          "secret": false
+        }
+      ],
+      "keyPlacement": {
+        "location": "env",
+        "name": "OPENAI_API_KEY"
+      }
+    }
+  ],
+  "tags": ["model-provider", "router", "openai-compatible"]
+}
