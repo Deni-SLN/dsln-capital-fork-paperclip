@@ -47,6 +47,11 @@ Pemberian izin dan hak akses alat kerja dapat diatur secara spesifik per-agen:
 * **Penyimpanan Cloud Kapasitas Besar**: MEGA Drive (`https://mega.nz`), TeraBox (1 TB Cloud Storage via Alist/MCP)
 * **Database Modern**: Supabase & Neon Serverless PostgreSQL
 
+### 6. 🖥️ Manajemen Server & Virtualisasi — Proxmox VE
+* **Kontrol Penuh VM & LXC**: Mengelola mesin virtual (KVM) dan kontainer LXC (start, stop, reboot, status, monitoring CPU & RAM).
+* **Snapshot & Rollback Otomatis**: AI Agent dapat membuat snapshot sebelum melakukan deploy atau perubahan konfigurasi berisiko, serta melakukan rollback jika terjadi kendala.
+* **Proxmox MCP & CLI Bawaan**: Terintegrasi via `skills/proxmox` dengan skrip CLI (`proxmox-tool.mjs`) dan Proxmox MCP Server (`proxmox-mcp.mjs`).
+
 ---
 
 ## 🏗️ Arsitektur Sistem
@@ -68,10 +73,11 @@ flowchart TD
         Server --> AIProviders["OpenAI / Anthropic / Local LLM"]
     end
 
-    subgraph Tools ["Ekosistem Alat Kerja"]
+    subgraph Tools ["Ekosistem Alat Kerja & Infrastruktur"]
         Server --> GoogleWS["Google Workspace (Drive/Docs/Sheets/Gmail)"]
         Server --> CloudStorage["MEGA Drive & TeraBox"]
         Server --> DataDB["Supabase & Neon Database"]
+        Server --> ProxmoxInfra["Proxmox VE (VM, LXC, Snapshot)"]
         Server --> Creative["Canva"]
     end
 ```
