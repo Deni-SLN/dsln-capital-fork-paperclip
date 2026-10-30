@@ -635,7 +635,7 @@ Saya telah menginstruksikan seluruh tim untuk mengintegrasikan masukan ini ke da
         createdIssues.push({
           id: issue.id,
           title: issue.title,
-          identifier: issue.identifier,
+          identifier: issue.identifier ?? undefined,
         });
       } catch (err) {
         console.error("Failed to create issue from meeting action item:", err);
