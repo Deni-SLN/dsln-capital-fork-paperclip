@@ -4,32 +4,28 @@ import { cn } from "../lib/utils";
 export function AnimatedPaperclipIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      viewBox="-1 -1 26 26"
-      className={cn("paperclip-thinking-icon", className)}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={cn("shrink-0 text-amber-500 animate-pulse", className)}
       aria-hidden="true"
       {...props}
     >
-      <path
-        className="paperclip-thinking-icon-path"
-        d="M16 6 l-8.414 8.586 a2.000 2.000 0 0 0 2.828 2.828 l8.414 -8.586 a4.000 4.000 0 1 0 -5.657 -5.657 l-8.379 8.551 a6.000 6.000 0 1 0 8.485 8.485 l8.379 -8.551"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <rect x="2" y="14" width="3.5" height="8" rx="0.75" />
+      <rect x="7.5" y="10" width="3.5" height="12" rx="0.75" />
+      <rect x="13" y="6" width="3.5" height="16" rx="0.75" />
+      <rect x="18.5" y="2" width="3.5" height="20" rx="0.75" />
     </svg>
   );
 }
 
-/** Full-page loading state: a large, centered, gray animated paperclip. */
+/** Full-page loading state: a centered, amber animated DSLN logo. */
 export function PaperclipLoading({ className }: { className?: string }) {
   return (
     <div
       role="status"
       className={cn("flex min-h-dvh w-full items-center justify-center", className)}
     >
-      <AnimatedPaperclipIcon className="h-24 w-24 text-muted-foreground" />
+      <AnimatedPaperclipIcon className="h-16 w-16" />
       <span className="sr-only">Loading…</span>
     </div>
   );

@@ -94,7 +94,11 @@ export function shouldDisableSecureAuthCookies(input: {
   publicUrl?: string | undefined;
   managedRuntimePublicUrl?: string | undefined;
   requestUrl?: string | undefined;
+  disableSecureCookiesOverride?: boolean | undefined;
 }): boolean {
+  if (input.disableSecureCookiesOverride ?? (process.env.PAPERCLIP_DISABLE_SECURE_COOKIES === "true")) {
+    return true;
+  }
   const publicUrl = (
     input.publicUrl?.trim() ||
     (input.authBaseUrlMode === "explicit" ? input.authPublicBaseUrl?.trim() : "")

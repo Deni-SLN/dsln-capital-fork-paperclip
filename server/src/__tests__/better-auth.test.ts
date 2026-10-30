@@ -152,6 +152,27 @@ describe("Better Auth cookie scoping", () => {
     } as Parameters<typeof shouldDisableSecureAuthCookies>[0])).toBe(true);
   });
 
+  it("honors PAPERCLIP_DISABLE_SECURE_COOKIES or explicit override even with https publicUrl", () => {
+    expect(shouldDisableSecureAuthCookies({
+      deploymentMode: "authenticated",
+      deploymentExposure: "public",
+      authBaseUrlMode: "explicit",
+      authPublicBaseUrl: "https://capital.dsln.my.id",
+      publicUrl: "https://capital.dsln.my.id",
+      disableSecureCookiesOverride: true,
+    })).toBe(true);
+
+    process.env.PAPERCLIP_DISABLE_SECURE_COOKIES = "true";
+    expect(shouldDisableSecureAuthCookies({
+      deploymentMode: "authenticated",
+      deploymentExposure: "public",
+      authBaseUrlMode: "explicit",
+      authPublicBaseUrl: "https://capital.dsln.my.id",
+      publicUrl: "https://capital.dsln.my.id",
+    })).toBe(true);
+    delete process.env.PAPERCLIP_DISABLE_SECURE_COOKIES;
+  });
+
   it("disables secure cookies for private authenticated auto mode without a public URL", () => {
     expect(shouldDisableSecureAuthCookies({
       deploymentMode: "authenticated",
