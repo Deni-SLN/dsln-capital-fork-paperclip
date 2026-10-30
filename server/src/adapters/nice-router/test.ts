@@ -56,15 +56,20 @@ export async function testEnvironment(
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3500);
-    const isLoopback = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(url.hostname);
-    const allowlist = isLoopback ? new Set([url.origin.toLowerCase()]) : undefined;
+    const allowlist = new Set([url.origin.toLowerCase()]);
+    const apiKey = asString(config.apiKey, "");
+    const headers: Record<string, string> = {};
+    if (apiKey) {
+      headers["authorization"] = `Bearer ${apiKey}`;
+    }
     try {
       // Probe Nice Router models or base endpoint
       const probeUrl = new URL(url.toString().replace(/\/+$/, "") + "/models");
       const response = await guardedHttpAdapterFetch(probeUrl, {
         method: "GET",
+        headers,
         signal: controller.signal,
-      }, allowlist ? { privateEndpointAllowlist: allowlist } : {});
+      }, { privateEndpointAllowlist: allowlist });
 
       if (response.ok) {
         checks.push({

@@ -39,37 +39,40 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
 
   try {
     ctx.onDispatch?.();
-    ctx.onLog?.({
-      stream: "stdout",
-      chunk: `[nice-router] Mengirim permintaan ke ${endpoint} (model: ${model})...\n`,
-    });
+    await ctx.onLog?.("stdout", `[nice-router] Mengirim permintaan ke ${endpoint} (model: ${model})...\n`);
 
     const parsedUrl = new URL(baseUrl);
-    const isLoopback = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(parsedUrl.hostname);
-    const allowlist = isLoopback ? new Set([parsedUrl.origin.toLowerCase()]) : undefined;
+    const allowlist = new Set([parsedUrl.origin.toLowerCase()]);
 
     const res = await guardedHttpAdapterFetch(endpoint, {
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
       ...(timer ? { signal: controller.signal } : {}),
-    }, allowlist ? { privateEndpointAllowlist: allowlist } : {});
+    }, { privateEndpointAllowlist: allowlist });
 
+    const rawText = await res.text();
     if (!res.ok) {
-      const errText = await res.text().catch(() => "");
-      throw new Error(`Nice Router mengembalikan status ${res.status}: ${errText}`);
+      throw new Error(`Nice Router mengembalikan status ${res.status}: ${rawText}`);
     }
 
-    const data = await res.json() as {
+    let data: {
       choices?: Array<{ message?: { content?: string } }>;
       content?: string;
     };
+    try {
+      data = JSON.parse(rawText.trim());
+    } catch {
+      const jsonMatch = rawText.match(/(\{[\s\S]*\})\s*data:\s*\[DONE\]/i) || rawText.match(/(\{[\s\S]*\})/);
+      if (jsonMatch) {
+        data = JSON.parse(jsonMatch[1]);
+      } else {
+        throw new Error(`Gagal mem-parse respon Nice Router: ${rawText.slice(0, 200)}`);
+      }
+    }
 
     const reply = data.choices?.[0]?.message?.content || data.content || "Tugas berhasil diselesaikan melalui Nice Router.";
-    ctx.onLog?.({
-      stream: "stdout",
-      chunk: `${reply}\n`,
-    });
+    await ctx.onLog?.("stdout", `${reply}\n`);
 
     return {
       exitCode: 0,
