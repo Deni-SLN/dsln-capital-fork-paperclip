@@ -17,13 +17,32 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     headers["authorization"] = `Bearer ${apiKey}`;
   }
 
-  const promptText = context.instructions || context.prompt || context.body || `Halo, ini tugas untuk ${agent.name}`;
+  const wake = parseObject(context.paperclipWake);
+  const wakeIssue = parseObject(wake.issue);
+  const rawIssue = parseObject(context.paperclipIssue);
+  const issueTitle = asString(rawIssue.title || wakeIssue.title, "");
+  const issueDescription = asString(rawIssue.description || wakeIssue.description, "");
+
+  let promptText =
+    asString(context.paperclipTaskMarkdown, "") ||
+    asString(context.instructions, "") ||
+    asString(context.prompt, "") ||
+    asString(context.body, "");
+
+  if (!promptText && issueTitle) {
+    promptText = `Tugas: ${issueTitle}\n\nDeskripsi:\n${issueDescription || "(Tidak ada deskripsi rinci)"}`;
+  }
+  if (!promptText) {
+    promptText = `Halo, ini adalah tugas untuk ${agent.name}. Silakan tinjau dan berikan respon terbaik Anda.`;
+  }
+
   const requestBody = {
     model,
     messages: [
       {
         role: "system",
-        content: `Anda adalah agen AI ${agent.name} yang berjalan melalui Paperclip dengan Nice Router (https://github.com/Deni-SLN/Nice-Router.git).`,
+        content: `Anda adalah agen AI ${agent.name} di Paperclip (dsln capital).
+Berikan jawaban yang jelas, profesional, dan ringkas dalam Bahasa Indonesia mengenai tugas yang didelegasikan kepada Anda.`,
       },
       {
         role: "user",
@@ -78,7 +97,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
       exitCode: 0,
       signal: null,
       timedOut: false,
-      summary: `Nice Router (${model}) -> ${baseUrl}`,
+      summary: reply,
     };
   } catch (err) {
     if (timer && err instanceof Error && err.name === "AbortError") {
