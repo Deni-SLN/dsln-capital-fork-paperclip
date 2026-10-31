@@ -150,60 +150,83 @@ export function OrganizationPage() {
 
     const deptMap = new Map<string, DepartmentData>();
 
-    const getDeptMeta = (role: string) => {
-      switch (role) {
-        case "ceo":
-          return {
-            id: "executive-office",
-            name: "Executive Office",
-            icon: Crown,
-            iconBg: "bg-amber-500/10",
-            iconColor: "text-amber-500",
-            description: "Divisi kepemimpinan eksekutif dan orkestrasi arah strategis DSLN Capital.",
-          };
-        case "lead":
-          return {
-            id: "strategy-governance",
-            name: "Strategy & Governance",
-            icon: Briefcase,
-            iconBg: "bg-blue-500/10",
-            iconColor: "text-blue-500",
-            description: "Divisi tata kelola, kepatuhan, dan perumusan eksekusi portofolio AI.",
-          };
-        case "specialist":
-          return {
-            id: "research-analytics",
-            name: "Research & Analytics",
-            icon: LineChart,
-            iconBg: "bg-purple-500/10",
-            iconColor: "text-purple-500",
-            description: "Divisi riset makroekonomi kuantitatif, analisis pasar, dan pemodelan data.",
-          };
-        case "support":
-          return {
-            id: "it-automation",
-            name: "IT & Automation",
-            icon: Cpu,
-            iconBg: "bg-indigo-500/10",
-            iconColor: "text-indigo-500",
-            description: "Divisi infrastruktur komputasi, otomatisasi alur kerja, dan integrasi layanan.",
-          };
-        case "general":
-        default:
-          return {
-            id: "operations-general",
-            name: "General Operations",
-            icon: Workflow,
-            iconBg: "bg-emerald-500/10",
-            iconColor: "text-emerald-500",
-            description: "Divisi operasional umum dan koordinasi penanganan tugas multifungsi.",
-          };
+    const getDeptMeta = (agent: Agent) => {
+      const name = (agent.name || "").toLowerCase();
+      const role = (agent.role || "").toLowerCase();
+
+      if (name.includes("ceo") || name.includes("sofia") || name.includes("hermes") || name.includes("cro") || role === "ceo") {
+        return {
+          id: "executive-office",
+          name: "Executive Office",
+          icon: Crown,
+          iconBg: "bg-amber-500/10",
+          iconColor: "text-amber-500",
+          description: "Divisi kepemimpinan eksekutif, CIO, COO, dan CRO DSLN Capital.",
+        };
       }
+      if (name.includes("news")) {
+        return {
+          id: "news-intelligence",
+          name: "News Intelligence Division",
+          icon: LineChart,
+          iconBg: "bg-blue-500/10",
+          iconColor: "text-blue-500",
+          description: "Divisi pemantauan berita ekonomi makro global dan perkembangan pasar domestik Indonesia.",
+        };
+      }
+      if (name.includes("social")) {
+        return {
+          id: "social-intelligence",
+          name: "Social Intelligence Division",
+          icon: Activity,
+          iconBg: "bg-pink-500/10",
+          iconColor: "text-pink-500",
+          description: "Divisi analisis sentimen, narasi trending di media sosial, dan deteksi viral assets.",
+        };
+      }
+      if (name.includes("risk")) {
+        return {
+          id: "risk-management",
+          name: "Risk Management Division",
+          icon: Shield,
+          iconBg: "bg-rose-500/10",
+          iconColor: "text-rose-500",
+          description: "Pengawasan risiko pasar kuantitatif, audit smart contract, dan kontrol independen.",
+        };
+      }
+      if (name.includes("trading") || name.includes("execution") || name.includes("investment")) {
+        return {
+          id: "trading-investment",
+          name: "Trading & Investment Division",
+          icon: Coins,
+          iconBg: "bg-emerald-500/10",
+          iconColor: "text-emerald-500",
+          description: "Divisi riset investasi saham/kripto/emas, perumusan strategi, dan eksekusi order.",
+        };
+      }
+      if (name.includes("legal") || name.includes("tax")) {
+        return {
+          id: "legal-tax",
+          name: "Legal & Tax Division",
+          icon: Briefcase,
+          iconBg: "bg-purple-500/10",
+          iconColor: "text-purple-500",
+          description: "Divisi kepatuhan regulasi finansial, legalitas platform, dan pelaporan pajak.",
+        };
+      }
+      return {
+        id: "general-operations",
+        name: "General Operations",
+        icon: Workflow,
+        iconBg: "bg-slate-500/10",
+        iconColor: "text-slate-500",
+        description: "Divisi operasional umum dan koordinasi penanganan tugas multifungsi.",
+      };
     };
 
     for (const agent of realAgents) {
       const roleKey = agent.role || "general";
-      const meta = getDeptMeta(roleKey);
+      const meta = getDeptMeta(agent);
 
       let dept = deptMap.get(meta.id);
       if (!dept) {
