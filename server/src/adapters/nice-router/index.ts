@@ -5,9 +5,11 @@ import { testEnvironment } from "./test.js";
 export const niceRouterAdapter: ServerAdapterModule = {
   type: "nice_router",
   runtimeToolDelivery: "invocation_context",
+  supportsLocalAgentJwt: true,
   execute,
   testEnvironment,
   models: [
+    { id: "free-models", label: "Free Models Combo (Nice Router)" },
     { id: "auto", label: "Auto Routing (Nice Router)" },
     { id: "meta-llama/llama-3.3-70b-instruct:free", label: "Llama 3.3 70B (Free)" },
     { id: "deepseek/deepseek-chat", label: "DeepSeek Chat" },
