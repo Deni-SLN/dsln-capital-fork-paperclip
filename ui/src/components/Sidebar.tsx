@@ -42,6 +42,8 @@ import { SidebarRecentTasks } from "./SidebarRecentTasks";
 import { useDialogActions } from "../context/DialogContext";
 import { useCompany } from "../context/CompanyContext";
 import { useSidebar } from "../context/SidebarContext";
+import { accessApi } from "../api/access";
+import { approvalsApi } from "../api/approvals";
 import { attentionApi } from "../api/attention";
 import { heartbeatsApi } from "../api/heartbeats";
 import { instanceSettingsApi } from "../api/instanceSettings";
@@ -122,6 +124,25 @@ export function Sidebar({ children }: { children?: ReactNode }) {
     refetchInterval: 60_000,
   });
   const attentionCount = attentionBadgeCount(attentionFeed);
+  const { data: pendingJoins = [] } = useQuery({
+    queryKey: queryKeys.access.joinRequests(selectedCompanyId ?? "", "pending_approval"),
+    queryFn: () => accessApi.listJoinRequests(selectedCompanyId!, "pending_approval"),
+    enabled: !!selectedCompanyId,
+    refetchInterval: 15_000,
+  });
+  const { data: approvalsList = [] } = useQuery({
+    queryKey: queryKeys.approvals.list(selectedCompanyId ?? ""),
+    queryFn: () => approvalsApi.list(selectedCompanyId!),
+    enabled: !!selectedCompanyId,
+    refetchInterval: 15_000,
+  });
+  const pendingApprovalsCount = approvalsList.filter(
+    (a) => a.status === "pending" || a.status === "revision_requested",
+  ).length;
+  const totalApprovalsCount =
+    pendingJoins.length +
+    pendingApprovalsCount +
+    (attentionCount > 0 ? attentionCount : 0);
   const showCases = experimentalSettings?.enableCases === true;
   // Conference Room Chat flag (PAP-136/PAP-137): the Conference Room nav item
   // is a new surface, hidden entirely while the flag is off (same no-flash
@@ -160,7 +181,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
           <SidebarNavItem to="/meetings" label="Ruang Rapat" icon={MessagesSquare} />
           <SidebarNavItem to="/projects" label="Proyek & Portofolio" icon={FolderOpen} />
           <SidebarNavItem to="/issues" label="Tugas & Operasi" icon={CheckSquare} badge={liveRunCount > 0 ? liveRunCount : undefined} badgeTone="danger" />
-          <SidebarNavItem to="/approvals" label="Persetujuan" icon={ShieldCheck} badge={attentionCount > 0 ? attentionCount : undefined} badgeTone="danger" />
+          <SidebarNavItem to="/approvals" label="Persetujuan" icon={ShieldCheck} badge={totalApprovalsCount > 0 ? totalApprovalsCount : undefined} badgeTone="danger" />
           <SidebarNavItem to="/costs" label="Pusat Biaya AI" icon={DollarSign} />
         </div>
 

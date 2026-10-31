@@ -70,7 +70,7 @@ function AgentChatsContent({ companyId, userId, enabled, loaded, agents, chats, 
             setOpeningId(agent.id); setOpenError(null);
             try { await openChat(agent); } catch (error) { setOpenError(error instanceof Error ? error.message : "Gagal membuka sesi obrolan. Silakan coba lagi."); } finally { setOpeningId(null); }
           }} className="flex items-center gap-3 rounded-lg border border-border p-4 text-left hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 transition-colors">
-          <AgentAvatar agent={agent} size={36} />
+          <AgentAvatar agent={agent} size={32} />
           <span className="flex min-w-0 flex-col gap-0.5"><span className="truncate text-sm font-semibold">{agent.name}</span><span className="text-xs text-muted-foreground">{openingId === agent.id ? "Membuka obrolan…" : agent.title ?? agent.role}</span></span>
         </button>)}
       </div>}

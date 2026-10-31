@@ -17,6 +17,7 @@ import {
 import { Fragment, useMemo, type ReactNode } from "react";
 import { PluginSlotOutlet, usePluginSlots } from "@/plugins/slots";
 import { PluginLauncherOutlet, usePluginLaunchers } from "@/plugins/launchers";
+import { NotificationPopover } from "./NotificationPopover";
 import { cn } from "../lib/utils";
 
 type GlobalToolbarContext = { companyId: string | null; companyPrefix: string | null };
@@ -85,16 +86,7 @@ export function BreadcrumbBar({ taskDetailLayout = false }: { taskDetailLayout?:
       </button>
 
       {/* Notification Bell */}
-      <div className="relative">
-        <button
-          type="button"
-          className="size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-          aria-label="Notifikasi"
-        >
-          <Bell className="size-4" />
-          <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-rose-500" />
-        </button>
-      </div>
+      <NotificationPopover companyId={selectedCompanyId} />
 
       {/* Theme toggle */}
       <button
