@@ -2272,11 +2272,17 @@ export function resolveJoinRequestAgentManagerId(
   const ceoCandidates = candidates.filter(
     (candidate) => candidate.role === "ceo"
   );
-  if (ceoCandidates.length === 0) return null;
-  const rootCeo = ceoCandidates.find(
+  if (ceoCandidates.length > 0) {
+    const rootCeo = ceoCandidates.find(
+      (candidate) => candidate.reportsTo === null
+    );
+    return (rootCeo ?? ceoCandidates[0] ?? null)?.id ?? null;
+  }
+  const rootAgent = candidates.find(
     (candidate) => candidate.reportsTo === null
   );
-  return (rootCeo ?? ceoCandidates[0] ?? null)?.id ?? null;
+  if (rootAgent) return rootAgent.id;
+  return candidates[0]?.id ?? null;
 }
 
 function isInviteTokenHashCollisionError(error: unknown) {
@@ -4223,11 +4229,6 @@ export function accessRoutes(
         assertLegacyAgentInviteAdapterType(existing.adapterType);
         const existingAgents = await agents.list(companyId);
         const managerId = resolveJoinRequestAgentManagerId(existingAgents);
-        if (!managerId) {
-          throw conflict(
-            "Join request cannot be approved because this company has no active CEO"
-          );
-        }
 
         const agentName = deduplicateAgentName(
           existing.agentName ?? "New Agent",
@@ -4240,7 +4241,7 @@ export function accessRoutes(
 
         const created = await agentsLifecycle.requestHire(companyId, {
           name: agentName,
-          role: "general",
+          role: managerId ? "general" : "ceo",
           title: null,
           status: "idle",
           reportsTo: managerId,

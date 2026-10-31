@@ -2,13 +2,17 @@ import { describe, expect, it } from "vitest";
 import { resolveJoinRequestAgentManagerId } from "../routes/access.js";
 
 describe("resolveJoinRequestAgentManagerId", () => {
-  it("returns null when no CEO exists in the company agent list", () => {
+  it("falls back to root agent when no CEO exists in the company agent list", () => {
     const managerId = resolveJoinRequestAgentManagerId([
       { id: "a1", role: "cto", reportsTo: null },
       { id: "a2", role: "engineer", reportsTo: "a1" },
     ]);
 
-    expect(managerId).toBeNull();
+    expect(managerId).toBe("a1");
+  });
+
+  it("returns null when candidates list is empty", () => {
+    expect(resolveJoinRequestAgentManagerId([])).toBeNull();
   });
 
   it("selects the root CEO when available", () => {

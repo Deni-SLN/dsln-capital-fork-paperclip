@@ -860,6 +860,8 @@ export function App() {
           <Route path="meetings" element={<UnprefixedBoardRedirect />} />
           <Route path="meetings/:meetingId" element={<UnprefixedBoardRedirect />} />
           <Route path="rapat" element={<UnprefixedBoardRedirect />} />
+          <Route path="chats" element={<UnprefixedBoardRedirect />} />
+          <Route path="chats/*" element={<UnprefixedBoardRedirect />} />
           <Route path="agents" element={<UnprefixedBoardRedirect />} />
           {AGENT_FILTER_TABS.map((tab) => (
             <Route key={tab} path={`agents/${tab}`} element={<UnprefixedBoardRedirect />} />
