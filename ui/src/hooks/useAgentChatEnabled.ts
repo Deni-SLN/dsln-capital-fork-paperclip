@@ -7,7 +7,7 @@ export function useAgentChatEnabled() {
     queryFn: () => instanceSettingsApi.getExperimental(),
   });
   return {
-    enabled: query.data?.enableAgentChat === true,
+    enabled: query.data?.enableAgentChat ?? true,
     loaded: query.isFetched,
   };
 }

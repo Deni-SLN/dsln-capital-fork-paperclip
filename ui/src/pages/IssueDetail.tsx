@@ -15,7 +15,7 @@ import { AgentIdentity } from "@/components/AgentIdentity";
 import { clearLegacyChatMessageRequests } from "@/lib/chat-message-request";
 import { agentChatDraft } from "@/lib/agent-chat-draft";
 import { trackRecentProject } from "@/lib/recent-projects";
-import { Settings as ChatSettings } from "lucide-react";
+import { CheckSquare, Settings as ChatSettings } from "lucide-react";
 import { agentDetailHref } from "./agent-detail-navigation";
 import { ExecutionBlockerNotice } from "../components/ExecutionBlockerNotice";
 import type { TaskComposerPause } from "../components/task-chat/TaskChatPausedTakeover";
@@ -5710,13 +5710,50 @@ export function TaskDetailSurface({ conversation, tasksTab }: { tasksTab?: TaskS
   });
 
   const conversationAgent = conversation?.agent ?? agents?.find(agent => agent.id === issue?.conversationAgentId);
+
+  const handleDelegateToTask = useCallback(() => {
+    if (!conversationAgent) return;
+    const latestAgentComment = [...comments].reverse().find(c => c.authorAgentId === conversationAgent.id || c.body?.trim());
+    const latestBody = latestAgentComment?.body?.trim() ?? "";
+    const firstLine = latestBody.split("\n")[0]?.replace(/^[#*\s-]+/, "").trim().slice(0, 80);
+    const title = firstLine && firstLine.length > 5 ? firstLine : `Tugas hasil diskusi: ${conversationAgent.name}`;
+    const description = latestBody
+      ? `### Hasil Diskusi Bersama ${conversationAgent.name}:\n\n${latestBody}\n\n---\n*Didelegasikan langsung dari ruang diskusi agen.*`
+      : `Tugas yang didelegasikan dari sesi diskusi bersama ${conversationAgent.name}.`;
+
+    openNewIssue({
+      assigneeAgentId: conversationAgent.id,
+      title,
+      description,
+      navigateOnCreate: true,
+    });
+  }, [conversationAgent, comments, openNewIssue]);
+
   useEffect(() => {
     if (conversationAgent) {
       setBreadcrumbs([{
         label: conversationAgent.name,
         leading: <AgentAvatar agent={conversationAgent} size={24} />,
         leadingKey: `agent:${conversationAgent.id}:${JSON.stringify(conversationAgent.appearance)}`,
-        trailing: <Button variant="ghost" size="icon-xs" asChild aria-label={`Configure ${conversationAgent.name}`}><Link to={agentDetailHref(conversationAgent.id, "runtime")}><ChatSettings /></Link></Button>,
+        trailing: (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={handleDelegateToTask}
+              className="gap-1.5 text-xs text-amber-500 border-amber-500/30 hover:bg-amber-500/10 font-medium"
+              title="Delegasikan hasil diskusi ini menjadi tugas resmi"
+            >
+              <CheckSquare className="size-3.5" />
+              <span>Delegasi Menjadi Tugas</span>
+            </Button>
+            <Button variant="ghost" size="icon-xs" asChild aria-label={`Configure ${conversationAgent.name}`}>
+              <Link to={agentDetailHref(conversationAgent.id, "runtime")}>
+                <ChatSettings />
+              </Link>
+            </Button>
+          </div>
+        ),
         trailingKey: `configure:${conversationAgent.id}`,
       }]);
       return;
@@ -5734,6 +5771,7 @@ export function TaskDetailSurface({ conversation, tasksTab }: { tasksTab?: TaskS
     ]);
   }, [
     conversationAgent,
+    handleDelegateToTask,
     breadcrumbTitle,
     breadcrumbIdentifier,
     hasLiveRuns,

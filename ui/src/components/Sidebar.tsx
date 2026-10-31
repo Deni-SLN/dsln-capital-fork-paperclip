@@ -156,6 +156,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
           <SidebarNavItem to="/dashboard" label="Pusat Komando" icon={LayoutDashboard} liveCount={liveRunCount} end />
           <SidebarNavItem to="/org" label="Struktur Organisasi" icon={Network} end />
           <SidebarNavItem to="/agents" label="Daftar Agen" icon={Users} />
+          <SidebarNavItem to="/chats" label="Diskusi Agen" icon={MessageCircle} />
           <SidebarNavItem to="/meetings" label="Ruang Rapat" icon={MessagesSquare} />
           <SidebarNavItem to="/projects" label="Proyek & Portofolio" icon={FolderOpen} />
           <SidebarNavItem to="/issues" label="Tugas & Operasi" icon={CheckSquare} badge={liveRunCount > 0 ? liveRunCount : undefined} badgeTone="danger" />
