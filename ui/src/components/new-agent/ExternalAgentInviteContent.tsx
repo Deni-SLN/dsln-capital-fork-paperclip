@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 import { DialogDescription, DialogTitle } from "../ui/dialog";
 import { cn } from "@/lib/utils";
 
-export type ExternalAgentPreset = "dot" | "grok_bot" | "muse" | "hermes" | "other";
+export type ExternalAgentPreset = "dot" | "grok_bot" | "muse" | "hermes" | "openclaw" | "other";
 export type DotConnectionState = {
   phase: "waiting" | "connected" | "subscribed" | "testing" | "finishing" | "ready";
   problem?: "event_timeout" | "prompt_unavailable" | "offline" | "agent_unavailable";
@@ -21,11 +21,12 @@ const presets = [
   { id: "grok_bot", name: "Grok Bot", adapter: "grok_bot", description: "An existing Bot in Grok" },
   { id: "muse", name: "Muse — Personal agent", adapter: "muse", description: "Your personal Muse at muse.ai" },
   { id: "hermes", name: "Hermes", adapter: "hermes_gateway", description: "An existing Hermes agent" },
+  { id: "openclaw", name: "OpenClaw", adapter: "openclaw_gateway", description: "An existing OpenClaw agent" },
   { id: "other", name: "Other", adapter: "http", description: "Any agent that can connect to Paperclip" },
 ] as const;
 
 export function ExternalAgentPresetPicker({ onSelect, dotDisabledReason, grokDisabledReason, museEnabled = false }: { onSelect: (preset: ExternalAgentPreset) => void; dotDisabledReason?: string; grokDisabledReason?: string; museEnabled?: boolean }) {
-  return <div className={cn("grid grid-cols-2 gap-3", !museEnabled && "sm:grid-cols-4")}>
+  return <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
     {presets.filter(preset => preset.id !== "muse" || museEnabled).map(preset => <button
       key={preset.id}
       type="button"
@@ -179,7 +180,7 @@ export function ExternalAgentInviteContent({
         {provider && <AdapterMark type={provider.adapter} className="size-10" />}
         <div className="space-y-2">
           <DialogTitle className="text-xl font-semibold tracking-tight">
-            {!provider ? "Invite an external agent" : muse ? ready ? "Muse is connected" : museDetails || museAwaitingInvitation ? "Invite your Muse" : "Connect your Muse" : dot ? ready ? "Your Dot is connected" : "Connect your Dot" : preset === "hermes" ? "Invite your Hermes agent" : "Invite your agent"}
+            {!provider ? "Invite an external agent" : muse ? ready ? "Muse is connected" : museDetails || museAwaitingInvitation ? "Invite your Muse" : "Connect your Muse" : dot ? ready ? "Your Dot is connected" : "Connect your Dot" : preset === "hermes" ? "Invite your Hermes agent" : preset === "openclaw" ? "Invite your OpenClaw agent" : "Invite your agent"}
           </DialogTitle>
           <DialogDescription className="text-sm leading-relaxed">
             {!provider ? `Bring an agent you already use into ${companyName}.`
@@ -193,7 +194,7 @@ export function ExternalAgentInviteContent({
               : connection.phase === "finishing" ? "Your Dot has connected and confirmed task updates. Paperclip is preparing it for assignments."
               : connecting ? "Your Dot has connected. We’re checking that task updates can travel both ways."
               : dot ? "Copy the setup prompt and send it to your Dot in ChatGPT. Your Dot will connect itself; we’ll watch for it here."
-              : `Copy the invitation prompt and send it to your ${preset === "hermes" ? "Hermes " : ""}agent. Approve its join request in Paperclip when it’s ready.`}
+              : `Copy the invitation prompt and send it to your ${preset === "hermes" ? "Hermes " : preset === "openclaw" ? "OpenClaw " : ""}agent. Approve its join request in Paperclip when it’s ready.`}
           </DialogDescription>
         </div>
       </div>
@@ -256,9 +257,9 @@ export function ExternalAgentInviteContent({
           key={preset}
           prompt={prompt}
           label={dot ? "Copy setup prompt" : "Copy invitation prompt"}
-          title={dot ? "Connect your Dot" : "Invite your agent"}
-          description={dot ? "Send this whole prompt to your Dot in ChatGPT." : "Send this whole prompt to your agent."}
-          agent={dot ? { name: "Dot", src: "/brands/adapters/openai-dot.svg" } : undefined}
+          title={dot ? "Connect your Dot" : preset === "openclaw" ? "Invite your OpenClaw agent" : preset === "hermes" ? "Invite your Hermes agent" : "Invite your agent"}
+          description={dot ? "Send this whole prompt to your Dot in ChatGPT." : preset === "openclaw" ? "Send this whole prompt to your OpenClaw agent." : "Send this whole prompt to your agent."}
+          agent={dot ? { name: "Dot", src: "/brands/adapters/openai-dot.svg" } : preset === "openclaw" ? { name: "OpenClaw", src: "/brands/adapters/openclaw.svg" } : undefined}
           align="end"
           className="min-w-0 shrink"
           onCopied={onCopied}
